@@ -1,19 +1,23 @@
 #include <AudioAnalyzer.h>
-#include <RBDdimmer.h>
 
-#define USE_SERIAL Serial
-#define outputPin 12
+#define RED_LIGHT_PIN 12
+#define YELLOW_LIGHT_PIN 8
+#define GREEN_LIGHT_PIN 13
+
+#define RED_LIGHT 0
+#define YELLOW_LIGHT 1
+#define GREEN_LIGHT 2
+
+#define ON 0x0
+#define OFF 0x1
 
 #define BAND 1
 #define THRESHOLD 680
-
 
 Analyzer Audio = Analyzer(4, 5, 5);
 
 int FreqVal[7];
 int BPM = 130;
-
-dimmerLamp dimmer(outputPin);
 
 long unsigned int wait = (60000/BPM)-(20*7);
 int freqzPrec = 0;
@@ -21,15 +25,19 @@ int freqzPrec2 = 0;
 bool synchronizing = true;
 int count = 0;
 
-
 void setup() {
   Serial.begin(57600);
   Audio.Init();  //Init module
-  dimmer.begin(NORMAL_MODE, OFF);
-  dimmer.setPower(50);
 
-  pinMode(6, OUTPUT);
-  pinMode(8, OUTPUT);
+  pinMode(RED_LIGHT_PIN, OUTPUT);
+  digitalWrite(RED_LIGHT_PIN, OFF);
+
+  pinMode(YELLOW_LIGHT_PIN, OUTPUT);
+  digitalWrite(YELLOW_LIGHT_PIN, OFF);
+
+  pinMode(GREEN_LIGHT_PIN, OUTPUT);
+  digitalWrite(GREEN_LIGHT_PIN, OFF);
+  
 }
 
 String bpmString = "";
@@ -85,8 +93,19 @@ void loop() {
   synchronizing = false;
 
   for (int i = 0; i < 7; i++) {
-    if (max((FreqVal[BAND] - 100), 0) >= THRESHOLD) { //4          //700 --> -7.2 dB
-      dimmer.setState(ON);
+    if ((i == BAND) && (max((FreqVal[BAND] - 100), 0) >= THRESHOLD)) { //4          //700 --> -7.2 dB
+      int randomLights = random(3);
+      switch (randomLights) {
+        case RED_LIGHT:
+            digitalWrite(RED_LIGHT_PIN, ON);
+          break;
+        case YELLOW_LIGHT:
+            digitalWrite(YELLOW_LIGHT_PIN, ON);
+          break;
+        case GREEN_LIGHT:
+            digitalWrite(GREEN_LIGHT_PIN, ON);
+        break;
+      }   
     } else if(i == BAND){
       count++;
       if (count > 1){
@@ -101,7 +120,9 @@ void loop() {
     //if(i<6)  Serial.print(",");
     //else Serial.println();
     delay(20);
-    dimmer.setState(OFF);
+    digitalWrite(RED_LIGHT_PIN, OFF);
+    digitalWrite(YELLOW_LIGHT_PIN, OFF);
+    digitalWrite(GREEN_LIGHT_PIN, OFF);
   }
   delay(wait);
 }
