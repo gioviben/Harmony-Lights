@@ -92,37 +92,36 @@ void loop() {
 
   synchronizing = false;
 
-  for (int i = 0; i < 7; i++) {
-    if ((i == BAND) && (max((FreqVal[BAND] - 100), 0) >= THRESHOLD)) { //4          //700 --> -7.2 dB
-      int randomLights = random(3);
-      switch (randomLights) {
-        case RED_LIGHT:
-            digitalWrite(RED_LIGHT_PIN, ON);
-          break;
-        case YELLOW_LIGHT:
-            digitalWrite(YELLOW_LIGHT_PIN, ON);
-          break;
-        case GREEN_LIGHT:
-            digitalWrite(GREEN_LIGHT_PIN, ON);
+  if ((max((FreqVal[BAND] - 100), 0) >= THRESHOLD)) { //4          //700 --> -7.2 dB
+    int randomLights = random(3);
+    switch (randomLights) {
+      case RED_LIGHT:
+          digitalWrite(RED_LIGHT_PIN, ON);
+          delay(140);
+          digitalWrite(RED_LIGHT_PIN, OFF);
         break;
-      }   
-    } else if(i == BAND){
-      count++;
-      if (count > 1){
-        count = 0;
-        synchronizing = true;
-        freqzPrec = 0;
-        freqzPrec2 = 0;
+      case YELLOW_LIGHT:
+          digitalWrite(YELLOW_LIGHT_PIN, ON);
+          delay(140);
+          digitalWrite(YELLOW_LIGHT_PIN, OFF);
         break;
-      }
-    } 
-    //Serial.print(max((FreqVal[i]-100),0));
-    //if(i<6)  Serial.print(",");
-    //else Serial.println();
-    delay(20);
-    digitalWrite(RED_LIGHT_PIN, OFF);
-    digitalWrite(YELLOW_LIGHT_PIN, OFF);
-    digitalWrite(GREEN_LIGHT_PIN, OFF);
-  }
+      case GREEN_LIGHT:
+          digitalWrite(GREEN_LIGHT_PIN, ON);
+          delay(140);
+          digitalWrite(GREEN_LIGHT_PIN, OFF);
+      break;
+    }   
+  } else {
+    count++;
+    if (count > 1){
+      count = 0;
+      synchronizing = true;
+      freqzPrec = 0;
+      freqzPrec2 = 0;
+    }
+  } 
+  //Serial.print(max((FreqVal[i]-100),0));
+  //if(i<6)  Serial.print(",");
+  //else Serial.println();
   delay(wait);
 }
